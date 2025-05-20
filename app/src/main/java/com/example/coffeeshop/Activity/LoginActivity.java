@@ -2,85 +2,98 @@ package com.example.coffeeshop.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.credentials.GetCredentialResponse;
 
 import com.example.coffeeshop.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.coffeeshop.Repository.AuthRepository;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String TAG = "LoginActivity";
-
     private EditText emailInput, passwordInput;
     private Button loginBtn;
-    private FirebaseAuth mAuth;
+    private ImageButton  googleBtn;
+    private AuthRepository authRepo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        mAuth = FirebaseAuth.getInstance();
+        // Initialize AuthRepository
+        authRepo = new AuthRepository(this);
 
         // Initialize Views
         emailInput = findViewById(R.id.get_email_login);
         passwordInput = findViewById(R.id.get_pass_login);
         loginBtn = findViewById(R.id.loginBtn);
+        googleBtn = findViewById(R.id.btnGoogleLogin); // Make sure this matches your XML
 
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            reload();
-        }
+        // Check if user is already logged in
+        authRepo.checkCurrentUser(new AuthRepository.EmailSignInCallback() {
+            @Override
+            public void onSignInSuccess(FirebaseUser user) {
+                goToMainActivity();
+            }
 
+            @Override
+            public void onSignInFailure(String errorMessage) {
+                // No user logged in, continue with normal flow
+            }
+        });
+
+        // Email login
         loginBtn.setOnClickListener(v -> {
             String email = emailInput.getText().toString().trim();
             String password = passwordInput.getText().toString().trim();
 
             if (!email.isEmpty() && !password.isEmpty()) {
-                signInWithEmailPassword(email, password);
+                authRepo.signInWithEmailPassword(email, password, new AuthRepository.EmailSignInCallback() {
+                    @Override
+                    public void onSignInSuccess(FirebaseUser user) {
+                        goToMainActivity();
+                    }
+
+                    @Override
+                    public void onSignInFailure(String errorMessage) {
+                        showToast(errorMessage);
+                    }
+                });
             } else {
                 showToast("Email and Password cannot be empty");
             }
         });
-    }
 
-    private void signInWithEmailPassword(String email, String password) {
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success
-                            Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
-                        } else {
-                            // If sign in fails
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            showToast("Authentication failed: " + task.getException().getMessage());
-                            updateUI(null);
-                        }
-                    }
-                });
-    }
+        // Google login
+        googleBtn.setOnClickListener(v -> {
+            authRepo.signInWithGoogle(new AuthRepository.GoogleSignInCallback() {
+                @Override
+                public void onSignInSuccess(FirebaseUser user) {
+                    goToMainActivity();
+                }
 
-    private void updateUI(FirebaseUser user) {
-        if (user != null) {
-            // Proceed to main activity or whatever your next screen is
-            goToMainActivity();
-        } else {
-            // Stay on login screen or show error message
-        }
+                @Override
+                public void onSignInFailure(String errorMessage) {
+                    showToast("Google sign-in failed: " + errorMessage);
+                }
+
+                @Override
+                public void onCredentialResponse(GetCredentialResponse credentialResponse) {
+                    // Handle credential response if needed
+                }
+
+                @Override
+                public void onCredentialError(String error) {
+                    showToast("Google sign-in error: " + error);
+                }
+            });
+        });
     }
 
     private void goToMainActivity() {
@@ -89,12 +102,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showToast(String message) {
-        Toast.makeText(LoginActivity.this, message, Toast.LENGTH_SHORT).show();
-    }
 
-    private void reload() {
-        // Your reload logic here
-        // For example, reload user profile or directly send to main screen:
-        goToMainActivity();
+        runOnUiThread(() -> {
+            Toast.makeText(LoginActivity.this, message, Toast.LENGTH_SHORT).show();
+        });
     }
 }
