@@ -12,14 +12,17 @@ import androidx.credentials.GetCredentialResponse;
 
 import com.example.coffeeshop.R;
 import com.example.coffeeshop.Repository.AuthRepository;
+import com.facebook.CallbackManager;
 import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
     private EditText emailInput, passwordInput;
     private Button loginBtn;
-    private ImageButton  googleBtn;
+    private ImageButton  googleBtn,facbookBtn;
     private AuthRepository authRepo;
+    CallbackManager callbackManager = CallbackManager.Factory.create();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +36,8 @@ public class LoginActivity extends AppCompatActivity {
         emailInput = findViewById(R.id.get_email_login);
         passwordInput = findViewById(R.id.get_pass_login);
         loginBtn = findViewById(R.id.loginBtn);
-        googleBtn = findViewById(R.id.btnGoogleLogin); // Make sure this matches your XML
+        googleBtn = findViewById(R.id.btnGoogleLogin);
+        facbookBtn=findViewById(R.id.btnFacebookLogin);
 
         // Check if user is already logged in
         authRepo.checkCurrentUser(new AuthRepository.EmailSignInCallback() {
@@ -94,6 +98,33 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
         });
+
+        facbookBtn.setOnClickListener(v -> {
+            authRepo.signInWithFacebook(callbackManager, new AuthRepository.FacebookSignInCallback() {
+                @Override
+                public void onSignInSuccess(FirebaseUser user) {
+                    goToMainActivity();
+                }
+
+                @Override
+                public void onSignInFailure(String errorMessage) {
+                    showToast("Facebook sign-in failed: " + errorMessage);
+                }
+
+                @Override
+                public void onCancel() {
+                    showToast("Facebook sign-in cancelled");
+                }
+
+                @Override
+                public void onError(String errorMessage) {
+                    showToast("Facebook sign-in error: " + errorMessage);
+                }
+            });
+        });
+
+
+
     }
 
     private void goToMainActivity() {
@@ -107,4 +138,6 @@ public class LoginActivity extends AppCompatActivity {
             Toast.makeText(LoginActivity.this, message, Toast.LENGTH_SHORT).show();
         });
     }
+
+
 }

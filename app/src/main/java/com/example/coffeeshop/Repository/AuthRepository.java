@@ -1,36 +1,43 @@
 package com.example.coffeeshop.Repository;
 
 
+import android.app.Activity;
 import android.content.Context;
-import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.credentials.Credential;
-import androidx.credentials.CustomCredential;
 import androidx.credentials.GetCredentialRequest;
 import androidx.credentials.GetCredentialResponse;
 import androidx.credentials.exceptions.GetCredentialException;
 import androidx.credentials.exceptions.NoCredentialException;
 
 import com.example.coffeeshop.R;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import java.util.Arrays;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class AuthRepository {
     private static final String TAG = "AuthRepository";
     private static final String TYPE_GOOGLE_ID_TOKEN_CREDENTIAL = "com.google.android.libraries.identity.googleid.GOOGLE_ID_TOKEN_CREDENTIAL";
-
+    //https://android-coffee-shop.firebaseapp.com/__/auth/handler
     private final FirebaseAuth mAuth;
     private final Context context;
     private final Executor executor = Executors.newSingleThreadExecutor();
@@ -48,9 +55,18 @@ public class AuthRepository {
         void onCredentialError(String error);
     }
 
+    public interface FacebookSignInCallback {
+        void onSignInSuccess(FirebaseUser user);
+        void onSignInFailure(String errorMessage);
+        void onCancel();
+        void onError(String errorMessage);
+    }
+
+
     public AuthRepository(Context context) {
         this.context = context;
         this.mAuth = FirebaseAuth.getInstance();
+
     }
 
     // Email Authentication Methods
@@ -165,4 +181,46 @@ public class AuthRepository {
             callback.onSignInSuccess(currentUser);
         }
     }
+
+    public void signInWithFacebook(CallbackManager callbackManager, FacebookSignInCallback callback) {
+        LoginManager.getInstance().logInWithReadPermissions(
+                (Activity) context,
+                Arrays.asList("email", "public_profile")
+        );
+
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        AccessToken token = loginResult.getAccessToken();
+                        handleFacebookAccessToken(token, callback);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        callback.onCancel();
+                    }
+
+                    @Override
+                    public void onError(FacebookException error) {
+                        callback.onError(error.getMessage());
+                    }
+                });
+    }
+
+    private void handleFacebookAccessToken(AccessToken token, FacebookSignInCallback callback) {
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        callback.onSignInSuccess(user);
+                    } else {
+                        callback.onSignInFailure(task.getException() != null ? task.getException().getMessage() : "Unknown error");
+                    }
+                });
+    }
+
+
 }
