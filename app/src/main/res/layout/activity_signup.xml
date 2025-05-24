@@ -8,16 +8,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_centerInParent="true"
         android:layout_gravity="center"
-        android:weightSum="4"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:weightSum="4">
 
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="LOGIN"
+            android:text="SIGN UP"
             android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="@color/darkBrown"
@@ -26,7 +25,7 @@
             android:layout_marginBottom="32dp" />
 
         <EditText
-            android:id="@+id/get_email_login"
+            android:id="@+id/get_email_signup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Email"
@@ -38,7 +37,7 @@
             android:inputType="textEmailAddress" />
 
         <EditText
-            android:id="@+id/get_pass_login"
+            android:id="@+id/get_pass_signup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Password"
@@ -49,24 +48,25 @@
             android:layout_marginBottom="8dp"
             android:inputType="textPassword" />
 
-        <TextView
-            android:id="@+id/forgot_password"
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/get_confirm_pass_signup"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Forgot Password?"
+            android:hint="Confirm Password"
             android:textColor="@color/darkBrown"
-            android:textSize="14sp"
-            android:gravity="end"
-            android:layout_gravity="end"
-            android:layout_marginVertical="12dp" />
+            android:textColorHint="@color/darkBrown"
+            android:background="@drawable/edit_text_bg"
+            android:padding="12dp"
+            android:layout_marginBottom="8dp"
+            android:inputType="textPassword" />
 
         <androidx.appcompat.widget.AppCompatButton
             style="@android:style/Widget.Button"
             android:textStyle="bold"
-            android:id="@+id/loginBtn"
+            android:id="@+id/signupBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Login"
+            android:text="Sign Up"
             android:textSize="18sp"
             android:layout_marginTop="30dp"
             android:background="@drawable/orange_bg"/>
@@ -80,8 +80,6 @@
             android:textColor="@color/darkBrown"
             android:layout_marginBottom="16dp" />
 
-
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -90,20 +88,20 @@
             android:layout_marginBottom="24dp">
 
             <ImageButton
-                android:id="@+id/btnGoogleLogin"
+                android:id="@+id/btnGoogleSignup"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:scaleType="fitCenter"
                 android:background="@null"
                 android:src="@drawable/google_logo"
-                android:contentDescription="Google Login" />
+                android:contentDescription="Google Sign Up" />
         </LinearLayout>
 
         <TextView
-            android:id="@+id/signup"
+            android:id="@+id/login_redirect"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Don't have an account? Sign up"
+            android:text="Already have an account? Login"
             android:textColor="@color/darkBrown"
             android:textSize="14sp"
             android:gravity="center"

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,8 +20,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText emailInput, passwordInput;
     private Button loginBtn;
-    private ImageButton  googleBtn,facbookBtn;
+    private ImageButton  googleBtn;
     private AuthRepository authRepo;
+    private TextView signupText;
     CallbackManager callbackManager = CallbackManager.Factory.create();
 
 
@@ -37,7 +39,7 @@ public class LoginActivity extends AppCompatActivity {
         passwordInput = findViewById(R.id.get_pass_login);
         loginBtn = findViewById(R.id.loginBtn);
         googleBtn = findViewById(R.id.btnGoogleLogin);
-        facbookBtn=findViewById(R.id.btnFacebookLogin);
+        signupText= findViewById(R.id.signup);
 
         // Check if user is already logged in
         authRepo.checkCurrentUser(new AuthRepository.EmailSignInCallback() {
@@ -99,32 +101,11 @@ public class LoginActivity extends AppCompatActivity {
             });
         });
 
-        facbookBtn.setOnClickListener(v -> {
-            authRepo.signInWithFacebook(callbackManager, new AuthRepository.FacebookSignInCallback() {
-                @Override
-                public void onSignInSuccess(FirebaseUser user) {
-                    goToMainActivity();
-                }
-
-                @Override
-                public void onSignInFailure(String errorMessage) {
-                    showToast("Facebook sign-in failed: " + errorMessage);
-                }
-
-                @Override
-                public void onCancel() {
-                    showToast("Facebook sign-in cancelled");
-                }
-
-                @Override
-                public void onError(String errorMessage) {
-                    showToast("Facebook sign-in error: " + errorMessage);
-                }
-            });
+        //redirect to signup page
+        signupText.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
+            startActivity(intent);
         });
-
-
-
     }
 
     private void goToMainActivity() {

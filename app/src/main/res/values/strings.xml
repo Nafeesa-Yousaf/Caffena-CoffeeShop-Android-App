@@ -23,7 +23,7 @@
     <string name="the_best_grain_the_finest_roast_nthe_powerful_flavor">The best grain,the finest roast\nthe powerful flavor</string>
     <string name="get_started">Get Started</string>
     <string name="web_client_id">994795155756-bn1etvqbibvrk7gk4giprb1t9qmrg7pi.apps.googleusercontent.com</string>
-        <string name="facebook_app_id">1908953879877235</string>  <!-- Replace with your Facebook App ID -->
-        <string name="fb_login_protocol_scheme">fb1908953879877235</string>  <!-- fb + your Facebook App ID -->
+    <string name="facebook_app_id">1908953879877235</string>  <!-- Replace with your Facebook App ID -->
+    <string name="fb_login_protocol_scheme">fb1908953879877235</string>  <!-- fb + your Facebook App ID -->
 
 </resources>

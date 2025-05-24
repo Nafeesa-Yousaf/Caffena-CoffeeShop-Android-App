@@ -1,0 +1,111 @@
+package com.example.coffeeshop.Activity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.credentials.GetCredentialResponse;
+
+import com.example.coffeeshop.R;
+import com.example.coffeeshop.Repository.AuthRepository;
+import com.google.firebase.auth.FirebaseUser;
+
+public class SignupActivity extends AppCompatActivity {
+
+    private EditText emailInput, passwordInput, confirmPasswordInput;
+    private Button signupBtn;
+    private ImageButton googleSignupBtn;
+    private TextView loginRedirect;
+    private AuthRepository authRepo;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_signup);
+
+        // Initialize AuthRepository
+        authRepo = new AuthRepository(this);
+
+        // Initialize Views
+        emailInput = findViewById(R.id.get_email_signup);
+        passwordInput = findViewById(R.id.get_pass_signup);
+        confirmPasswordInput = findViewById(R.id.get_confirm_pass_signup); // NEW
+        signupBtn = findViewById(R.id.signupBtn);
+        googleSignupBtn = findViewById(R.id.btnGoogleSignup);
+        loginRedirect = findViewById(R.id.login_redirect);
+
+        // Handle Email Signup
+        signupBtn.setOnClickListener(v -> {
+            String email = emailInput.getText().toString().trim();
+            String password = passwordInput.getText().toString().trim();
+            String confirmPassword = confirmPasswordInput.getText().toString().trim(); // NEW
+
+            if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+                showToast("All fields are required");
+                return;
+            }
+
+            if (!password.equals(confirmPassword)) {
+                showToast("Passwords do not match");
+                return;
+            }
+
+            authRepo.signUpWithEmailPassword(email, password, new AuthRepository.EmailSignInCallback() {
+                @Override
+                public void onSignInSuccess(FirebaseUser user) {
+                    showToast("Sign up successful!");
+                    goToMainActivity();
+                }
+
+                @Override
+                public void onSignInFailure(String errorMessage) {
+                    showToast("Sign up failed: " + errorMessage);
+                }
+            });
+        });
+
+        // Google Signup Logic (unchanged)
+        googleSignupBtn.setOnClickListener(v -> {
+            authRepo.signInWithGoogle(new AuthRepository.GoogleSignInCallback() {
+                @Override
+                public void onSignInSuccess(FirebaseUser user) {
+                    showToast("Signed up with Google!");
+                    goToMainActivity();
+                }
+
+                @Override
+                public void onSignInFailure(String errorMessage) {
+                    showToast("Google sign-up failed: " + errorMessage);
+                }
+
+                @Override
+                public void onCredentialResponse(GetCredentialResponse credentialResponse) {}
+
+                @Override
+                public void onCredentialError(String error) {
+                    showToast("Google sign-up error: " + error);
+                }
+            });
+        });
+
+        // Login Redirect
+        loginRedirect.setOnClickListener(v -> {
+            startActivity(new Intent(SignupActivity.this, LoginActivity.class));
+            finish();
+        });
+    }
+
+    private void goToMainActivity() {
+        startActivity(new Intent(SignupActivity.this, MainActivity.class));
+        finish();
+    }
+
+    private void showToast(String message) {
+        runOnUiThread(() -> Toast.makeText(SignupActivity.this, message, Toast.LENGTH_SHORT).show());
+    }
+}
