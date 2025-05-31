@@ -42,17 +42,7 @@ public class LoginActivity extends AppCompatActivity {
         signupText= findViewById(R.id.signup);
         forgotPasswordText = findViewById(R.id.forgot_password);
 
-        authRepo.checkCurrentUser(new AuthRepository.EmailSignInCallback() {
-            @Override
-            public void onSignInSuccess(FirebaseUser user) {
-                goToMainActivity();
-            }
 
-            @Override
-            public void onSignInFailure(String errorMessage) {
-                showToast(errorMessage);
-            }
-        });
 
         // Link with forgot password screen
         forgotPasswordText.setOnClickListener(v -> {
