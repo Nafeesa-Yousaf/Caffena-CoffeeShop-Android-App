@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         displayUserName();
 
         initBanner();
+        initCategory();
         initPopular();
     }
 
@@ -83,7 +84,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void initCategory() {
+        // Show progress bar
+        binding.progressBarCatagory.setVisibility(View.VISIBLE);
 
+        // Observe ViewModel data
+        viewModel.loadCategory().observeForever(categories -> {
+            // Set up RecyclerView layout manager
+            binding.recyclerViewCat.setLayoutManager(
+                    new LinearLayoutManager(
+                            this, // Context
+                            LinearLayoutManager.HORIZONTAL, // Orientation
+                            false // reverseLayout
+                    )
+            );
+
+            // Set adapter with category data
+            binding.recyclerViewCat.setAdapter(new CategoryAdapter(categories));
+
+            // Hide progress bar after loading data
+            binding.progressBarCatagory.setVisibility(View.GONE);
+        });
+        viewModel.loadCategory();
+    }
 
     private void initBanner() {
         binding.progressBarBanner.setVisibility(View.VISIBLE);
