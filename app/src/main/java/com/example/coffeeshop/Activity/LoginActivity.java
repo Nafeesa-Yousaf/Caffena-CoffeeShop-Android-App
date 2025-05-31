@@ -11,8 +11,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.credentials.GetCredentialResponse;
 
+import com.example.coffeeshop.Domain.UserModel;
 import com.example.coffeeshop.R;
 import com.example.coffeeshop.Repository.AuthRepository;
+import com.example.coffeeshop.Repository.UserRepository;
 import com.facebook.CallbackManager;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -60,8 +62,19 @@ public class LoginActivity extends AppCompatActivity {
                 authRepo.signInWithEmailPassword(email, password, new AuthRepository.EmailSignInCallback() {
                     @Override
                     public void onSignInSuccess(FirebaseUser user) {
-                        showToast("Login successfully");
-                        goToMainActivity();
+                        // 👇 Fetch the user info from DB using UID
+                        new UserRepository().fetchUser(user.getUid(), new UserRepository.OnUserFetchListener() {
+                            @Override
+                            public void onUserFetched(UserModel userModel) {
+                                showToast("Welcome, " + userModel.getName());
+                                goToMainActivity();
+                            }
+
+                            @Override
+                            public void onFailure(String errorMessage) {
+                                showToast("User data fetch failed: " + errorMessage);
+                            }
+                        });
                     }
 
                     @Override
@@ -69,6 +82,7 @@ public class LoginActivity extends AppCompatActivity {
                         showToast("Incorrect Email or Password");
                     }
                 });
+
             } else {
                 showToast("Email and Password cannot be empty");
             }
@@ -79,7 +93,18 @@ public class LoginActivity extends AppCompatActivity {
             authRepo.signInWithGoogle(new AuthRepository.GoogleSignInCallback() {
                 @Override
                 public void onSignInSuccess(FirebaseUser user) {
-                    goToMainActivity();
+                    new UserRepository().fetchUser(user.getUid(), new UserRepository.OnUserFetchListener() {
+                        @Override
+                        public void onUserFetched(UserModel userModel) {
+                            showToast("Welcome, " + userModel.getName());
+                            goToMainActivity();
+                        }
+
+                        @Override
+                        public void onFailure(String errorMessage) {
+                            showToast("User data fetch failed: " + errorMessage);
+                        }
+                    });
                 }
 
                 @Override
@@ -89,7 +114,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void onCredentialResponse(GetCredentialResponse credentialResponse) {
-                    // Handle credential response if needed
+                    // You can handle this if needed
                 }
 
                 @Override
@@ -97,6 +122,7 @@ public class LoginActivity extends AppCompatActivity {
                     showToast("Google sign-in error: " + error);
                 }
             });
+
         });
 
         //redirect to signup page
