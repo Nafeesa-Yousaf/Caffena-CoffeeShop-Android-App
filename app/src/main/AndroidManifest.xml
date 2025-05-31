@@ -16,10 +16,12 @@
         android:theme="@style/Theme.CoffeeShop"
         tools:replace="android:appComponentFactory"
         tools:targetApi="31">
+        <activity android:name=".Activity.ForgotPasswordActivity"
+            android:exported="false" />
+
         <activity
             android:name=".Activity.SignupActivity"
-            android:exported="false" />
-        <!-- Facebook SDK meta-data -->
+            android:exported="false" /> <!-- Facebook SDK meta-data -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" /> <!-- Facebook Activities -->

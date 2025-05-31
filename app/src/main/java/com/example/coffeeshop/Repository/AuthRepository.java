@@ -52,6 +52,10 @@ public class AuthRepository {
         this.mAuth = FirebaseAuth.getInstance();
 
     }
+    public interface PasswordResetCallback {
+        void onResetEmailSent();
+        void onResetFailed(String error);
+    }
 
     // Email Authentication Methods
     // Email Signup Method
@@ -171,6 +175,21 @@ public class AuthRepository {
                     }
                 });
     }
+
+    //Forgot Password
+    public void sendPasswordReset(String email, PasswordResetCallback callback) {
+        mAuth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        callback.onResetEmailSent();
+                    } else {
+                        String error = task.getException() != null ? task.getException().getMessage() : "Unknown error";
+                        callback.onResetFailed(error);
+                    }
+                });
+    }
+
+
 
     // Common Methods
     public FirebaseUser getCurrentUser() {

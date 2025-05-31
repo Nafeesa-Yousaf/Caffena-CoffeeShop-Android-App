@@ -25,6 +25,7 @@ public class LoginActivity extends AppCompatActivity {
     private ImageButton  googleBtn;
     private AuthRepository authRepo;
     private TextView signupText;
+    private TextView forgotPasswordText;
     CallbackManager callbackManager = CallbackManager.Factory.create();
 
 
@@ -40,6 +41,7 @@ public class LoginActivity extends AppCompatActivity {
         loginBtn = findViewById(R.id.loginBtn);
         googleBtn = findViewById(R.id.btnGoogleLogin);
         signupText= findViewById(R.id.signup);
+        forgotPasswordText = findViewById(R.id.forgot_password);
 
         authRepo.checkCurrentUser(new AuthRepository.EmailSignInCallback() {
             @Override
@@ -51,6 +53,11 @@ public class LoginActivity extends AppCompatActivity {
             public void onSignInFailure(String errorMessage) {
                 showToast(errorMessage);
             }
+        });
+//link with forgoot password screen
+        forgotPasswordText.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent);
         });
 
         // Email login
