@@ -110,4 +110,35 @@ public class MainRepository {
 
         return listData;
     }
+
+
+    public LiveData<List<ItemsModel>> loadItemsCategory(String categoryId) {
+        MutableLiveData<List<ItemsModel>> itemsLiveData = new MutableLiveData<>();
+        DatabaseReference ref = firebaseDatabase.getReference("Items");
+
+        ref.orderByChild("categoryId").equalTo(categoryId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+                        List<ItemsModel> list = new ArrayList<>();
+
+                        for (DataSnapshot childSnapshot : snapshot.getChildren()) {
+                            ItemsModel item = childSnapshot.getValue(ItemsModel.class);
+                            if (item != null) {
+                                list.add(item);
+                            }
+                        }
+
+                        itemsLiveData.setValue(list);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        Log.e("FirebaseError", "Data fetching error: " + error.getMessage());
+                    }
+                });
+
+        return itemsLiveData;
+    }
+
 }
