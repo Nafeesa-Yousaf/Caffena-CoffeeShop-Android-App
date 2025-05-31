@@ -31,17 +31,14 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        // Initialize AuthRepository
         authRepo = new AuthRepository(this);
 
-        // Initialize Views
         emailInput = findViewById(R.id.get_email_login);
         passwordInput = findViewById(R.id.get_pass_login);
         loginBtn = findViewById(R.id.loginBtn);
         googleBtn = findViewById(R.id.btnGoogleLogin);
         signupText= findViewById(R.id.signup);
 
-        // Check if user is already logged in
         authRepo.checkCurrentUser(new AuthRepository.EmailSignInCallback() {
             @Override
             public void onSignInSuccess(FirebaseUser user) {
@@ -50,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onSignInFailure(String errorMessage) {
-                // No user logged in, continue with normal flow
+                showToast(errorMessage);
             }
         });
 
@@ -63,12 +60,13 @@ public class LoginActivity extends AppCompatActivity {
                 authRepo.signInWithEmailPassword(email, password, new AuthRepository.EmailSignInCallback() {
                     @Override
                     public void onSignInSuccess(FirebaseUser user) {
+                        showToast("Login successfully");
                         goToMainActivity();
                     }
 
                     @Override
                     public void onSignInFailure(String errorMessage) {
-                        showToast(errorMessage);
+                        showToast("Incorrect Email or Password");
                     }
                 });
             } else {
