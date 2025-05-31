@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.credentials.GetCredentialResponse;
 
+import com.example.coffeeshop.Domain.UserModel;
 import com.example.coffeeshop.R;
 import com.example.coffeeshop.Repository.AuthRepository;
 import com.example.coffeeshop.Repository.UserRepository;
@@ -66,9 +67,21 @@ public class SignupActivity extends AppCompatActivity {
                 public void onSignInSuccess(FirebaseUser user) {
                     // Store in Realtime Database
                     userRepo.registerUser(name, email, user.getUid());
+                    new UserRepository().fetchUser(user.getUid(), SignupActivity.this, new UserRepository.OnUserFetchListener() {
+                        @Override
+                        public void onUserFetched(UserModel userModel) {
+                            showToast("Sign up successful!");
+                            goToMainActivity();
+                        }
 
-                    showToast("Sign up successful!");
-                    goToMainActivity();
+                        @Override
+                        public void onFailure(String errorMessage) {
+                            showToast("User data fetch failed: " + errorMessage);
+                        }
+                    });
+
+
+
                 }
 
                 @Override
@@ -84,8 +97,19 @@ public class SignupActivity extends AppCompatActivity {
                 @Override
                 public void onSignInSuccess(FirebaseUser user) {
                     userRepo.registerUser(user.getDisplayName(), user.getEmail(), user.getUid());
-                    showToast("Signed up with Google!");
-                    goToMainActivity();
+                    new UserRepository().fetchUser(user.getUid(), SignupActivity.this, new UserRepository.OnUserFetchListener() {
+                        @Override
+                        public void onUserFetched(UserModel userModel) {
+                            showToast("Sign up successful!");
+                            goToMainActivity();
+                        }
+
+                        @Override
+                        public void onFailure(String errorMessage) {
+                            showToast("User data fetch failed: " + errorMessage);
+                        }
+                    });
+
                 }
 
                 @Override

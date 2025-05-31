@@ -22,12 +22,11 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText emailInput, passwordInput;
     private Button loginBtn;
-    private ImageButton  googleBtn;
+    private ImageButton googleBtn;
     private AuthRepository authRepo;
     private TextView signupText;
     private TextView forgotPasswordText;
     CallbackManager callbackManager = CallbackManager.Factory.create();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +53,8 @@ public class LoginActivity extends AppCompatActivity {
                 showToast(errorMessage);
             }
         });
-//link with forgoot password screen
+
+        // Link with forgot password screen
         forgotPasswordText.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
             startActivity(intent);
@@ -69,8 +69,8 @@ public class LoginActivity extends AppCompatActivity {
                 authRepo.signInWithEmailPassword(email, password, new AuthRepository.EmailSignInCallback() {
                     @Override
                     public void onSignInSuccess(FirebaseUser user) {
-                        // 👇 Fetch the user info from DB using UID
-                        new UserRepository().fetchUser(user.getUid(), new UserRepository.OnUserFetchListener() {
+                        // 👇 Fetch the user info from DB using UID and save in SharedPreferences
+                        new UserRepository().fetchUser(user.getUid(), LoginActivity.this, new UserRepository.OnUserFetchListener() {
                             @Override
                             public void onUserFetched(UserModel userModel) {
                                 showToast("Welcome, " + userModel.getName());
@@ -100,7 +100,8 @@ public class LoginActivity extends AppCompatActivity {
             authRepo.signInWithGoogle(new AuthRepository.GoogleSignInCallback() {
                 @Override
                 public void onSignInSuccess(FirebaseUser user) {
-                    new UserRepository().fetchUser(user.getUid(), new UserRepository.OnUserFetchListener() {
+                    // 👇 Fetch user info and save in SharedPreferences
+                    new UserRepository().fetchUser(user.getUid(), LoginActivity.this, new UserRepository.OnUserFetchListener() {
                         @Override
                         public void onUserFetched(UserModel userModel) {
                             showToast("Welcome, " + userModel.getName());
@@ -121,7 +122,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void onCredentialResponse(GetCredentialResponse credentialResponse) {
-                    // You can handle this if needed
+                    // Optional: handle credential response if needed
                 }
 
                 @Override
@@ -129,10 +130,9 @@ public class LoginActivity extends AppCompatActivity {
                     showToast("Google sign-in error: " + error);
                 }
             });
-
         });
 
-        //redirect to signup page
+        // Redirect to signup page
         signupText.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
             startActivity(intent);
@@ -145,11 +145,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void showToast(String message) {
-
-        runOnUiThread(() -> {
-            Toast.makeText(LoginActivity.this, message, Toast.LENGTH_SHORT).show();
-        });
+        runOnUiThread(() -> Toast.makeText(LoginActivity.this, message, Toast.LENGTH_SHORT).show());
     }
-
-
 }

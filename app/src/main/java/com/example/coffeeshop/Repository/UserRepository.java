@@ -1,11 +1,12 @@
 package com.example.coffeeshop.Repository;
 
+import android.content.Context;
 
 import androidx.annotation.NonNull;
 
 import com.example.coffeeshop.Domain.UserModel;
+import com.example.coffeeshop.Repository.UserPreferences;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.*;
 
 public class UserRepository {
@@ -32,13 +33,17 @@ public class UserRepository {
                 });
     }
 
-    // Fetch user data during login
-    public void fetchUser(String uid, final OnUserFetchListener listener) {
+    // Fetch user data during login and save to SharedPreferences
+    public void fetchUser(String uid, Context context, final OnUserFetchListener listener) {
         userRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 UserModel user = snapshot.getValue(UserModel.class);
                 if (user != null) {
+                    // Save user data in SharedPreferences
+                    UserPreferences preferences = new UserPreferences(context);
+                    preferences.saveUser(user.getUid(), user.getName(), user.getEmail());
+
                     listener.onUserFetched(user);
                 } else {
                     listener.onFailure("User not found in database");
@@ -58,4 +63,3 @@ public class UserRepository {
         void onFailure(String errorMessage);
     }
 }
-

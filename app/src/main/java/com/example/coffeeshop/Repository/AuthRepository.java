@@ -32,7 +32,7 @@ public class AuthRepository {
     private final FirebaseAuth mAuth;
     private final Context context;
     private final Executor executor = Executors.newSingleThreadExecutor();
-
+    private final UserPreferences userPreferences;
     // Callback interfaces
     public interface EmailSignInCallback {
         void onSignInSuccess(FirebaseUser user);
@@ -50,6 +50,7 @@ public class AuthRepository {
     public AuthRepository(Context context) {
         this.context = context;
         this.mAuth = FirebaseAuth.getInstance();
+        this.userPreferences = new UserPreferences(context);  // Initialize here
 
     }
     public interface PasswordResetCallback {
@@ -197,6 +198,7 @@ public class AuthRepository {
     }
 
     public void signOut() {
+        userPreferences.clearUser();
         mAuth.signOut();
         Log.d(TAG, "User signed out from Firebase");
     }
