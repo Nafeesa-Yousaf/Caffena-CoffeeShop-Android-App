@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             startActivity(intent);
         });
+        binding.exploreBtn.setOnClickListener(v->{});
     }
 
     private void displayUserName() {
