@@ -23,7 +23,7 @@ public class SignupActivity extends AppCompatActivity {
     private Button signupBtn;
     private ImageButton googleSignupBtn;
     private TextView loginRedirect;
-
+    private String signupBtnOriginalText;
     private AuthRepository authRepo;
     private UserRepository userRepo;
 
@@ -44,6 +44,8 @@ public class SignupActivity extends AppCompatActivity {
         signupBtn = findViewById(R.id.signupBtn);
         googleSignupBtn = findViewById(R.id.btnGoogleSignup);
         loginRedirect = findViewById(R.id.login_redirect);
+        signupBtnOriginalText = signupBtn.getText().toString();
+
 
         // Email Sign Up
         signupBtn.setOnClickListener(v -> {
@@ -61,9 +63,12 @@ public class SignupActivity extends AppCompatActivity {
                 showToast("Passwords do not match");
                 return;
             }
+            setSignUpBtnLoading(true);
 
             authRepo.signUpWithEmailPassword(email, password, new AuthRepository.EmailSignInCallback() {
+
                 @Override
+
                 public void onSignInSuccess(FirebaseUser user) {
                     // Store in Realtime Database
                     userRepo.registerUser(name, email, user.getUid());
@@ -71,12 +76,14 @@ public class SignupActivity extends AppCompatActivity {
                         @Override
                         public void onUserFetched(UserModel userModel) {
                             showToast("Sign up successful!");
+                            setSignUpBtnLoading(false);
                             goToMainActivity();
                         }
 
                         @Override
                         public void onFailure(String errorMessage) {
                             showToast("User data fetch failed: " + errorMessage);
+                            setSignUpBtnLoading(false);
                         }
                     });
 
@@ -86,6 +93,7 @@ public class SignupActivity extends AppCompatActivity {
 
                 @Override
                 public void onSignInFailure(String errorMessage) {
+                    setSignUpBtnLoading(false);
                     showToast("Sign up failed: " + errorMessage);
                 }
             });
@@ -133,7 +141,12 @@ public class SignupActivity extends AppCompatActivity {
             finish();
         });
     }
-
+    private void setSignUpBtnLoading(boolean isLoading) {
+        runOnUiThread(() -> {
+            signupBtn.setEnabled(!isLoading);
+            signupBtn.setText(isLoading ? "Loading..." : signupBtnOriginalText);
+        });
+    }
     private void goToMainActivity() {
         startActivity(new Intent(SignupActivity.this, MainActivity.class));
         finish();

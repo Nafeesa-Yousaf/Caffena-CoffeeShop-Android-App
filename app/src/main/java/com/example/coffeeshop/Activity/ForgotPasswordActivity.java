@@ -14,6 +14,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
     private EditText emailInput;
     private Button resetPasswordBtn;
+    private String forgotBtnOriginalText;
 
     private AuthRepository authRepo;
 
@@ -24,6 +25,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
         emailInput = findViewById(R.id.get_email_forgot);
         resetPasswordBtn = findViewById(R.id.resetPasswordBtn);
+        forgotBtnOriginalText = resetPasswordBtn.getText().toString();
 
         authRepo = new AuthRepository(this);
 
@@ -33,21 +35,29 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 showToast("Please enter your email");
                 return;
             }
+            setBtnLoading(true);
             authRepo.sendPasswordReset(email, new AuthRepository.PasswordResetCallback() {
                 @Override
                 public void onResetEmailSent() {
+                    setBtnLoading(false);
                     showToast("Password reset email sent! Check your inbox.");
                     finish(); // optional, close this screen after success
                 }
 
                 @Override
                 public void onResetFailed(String error) {
+                    setBtnLoading(false);
                     showToast("Failed to send reset email: " + error);
                 }
             });
         });
     }
-
+    private void setBtnLoading(boolean isLoading) {
+        runOnUiThread(() -> {
+            resetPasswordBtn.setEnabled(!isLoading);
+            resetPasswordBtn.setText(isLoading ? "Loading..." : forgotBtnOriginalText);
+        });
+    }
     private void showToast(String message) {
         Toast.makeText(ForgotPasswordActivity.this, message, Toast.LENGTH_SHORT).show();
     }

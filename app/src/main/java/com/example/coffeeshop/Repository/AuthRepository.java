@@ -57,6 +57,11 @@ public class AuthRepository {
         void onResetEmailSent();
         void onResetFailed(String error);
     }
+    public interface DeleteAccountCallback {
+        void onDeleteSuccess();
+        void onDeleteFailure(String errorMessage);
+    }
+
 
     // Email Authentication Methods
     // Email Signup Method
@@ -191,6 +196,27 @@ public class AuthRepository {
     }
 
 
+//Delete Account Method
+public void deleteUserAccount(DeleteAccountCallback callback) {
+    FirebaseUser user = mAuth.getCurrentUser();
+
+    if (user != null) {
+        user.delete()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "User account deleted.");
+                        userPreferences.clearUser(); // Clear local user data
+                        callback.onDeleteSuccess();
+                    } else {
+                        String error = task.getException() != null ? task.getException().getMessage() : "Unknown error";
+                        Log.e(TAG, "Account deletion failed: " + error);
+                        callback.onDeleteFailure(error);
+                    }
+                });
+    } else {
+        callback.onDeleteFailure("No user is currently signed in.");
+    }
+}
 
     // Common Methods
     public FirebaseUser getCurrentUser() {

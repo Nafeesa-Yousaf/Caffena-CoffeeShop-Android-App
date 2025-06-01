@@ -75,6 +75,10 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, CartActivity.class);
             startActivity(intent);
         });
+        binding.profileBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void displayUserName() {
