@@ -47,7 +47,10 @@ public class ManagmentCart {
         }
         return list;
     }
+    public void clearCart() {
+        tinyDB.remove("CartList");
 
+    }
     public void minusItem(ArrayList<ItemsModel> listItems, int position, ChangeNumberItemsListener listener) {
         if (listItems.get(position).getNumberInCart() == 1) {
             listItems.remove(position);
