@@ -34,7 +34,6 @@ public class ProfileActivity extends AppCompatActivity {
 
         userPrefs = new UserPreferences(this);
 
-        // Show saved user data
         String name = userPrefs.getName();
         String email = userPrefs.getEmail();
         tvUserName.setText("Name: " + (name != null ? name : "Not found"));
@@ -48,20 +47,14 @@ public class ProfileActivity extends AppCompatActivity {
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         input.setHint("Enter password");
 
-        new AlertDialog.Builder(this)
-                .setTitle("Confirm Password")
-                .setMessage("Please enter your password to delete your account.")
-                .setView(input)
-                .setPositiveButton("Confirm", (dialog, which) -> {
-                    String password = input.getText().toString().trim();
-                    if (!password.isEmpty()) {
-                        reauthenticateAndDelete(password);
-                    } else {
-                        Toast.makeText(ProfileActivity.this, "Password cannot be empty", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+        new AlertDialog.Builder(this).setTitle("Confirm Password").setMessage("Please enter your password to delete your account.").setView(input).setPositiveButton("Confirm", (dialog, which) -> {
+            String password = input.getText().toString().trim();
+            if (!password.isEmpty()) {
+                reauthenticateAndDelete(password);
+            } else {
+                Toast.makeText(ProfileActivity.this, "Password cannot be empty", Toast.LENGTH_SHORT).show();
+            }
+        }).setNegativeButton("Cancel", null).show();
     }
 
     private void reauthenticateAndDelete(String password) {
@@ -78,7 +71,6 @@ public class ProfileActivity extends AppCompatActivity {
             return;
         }
 
-        // Show loading state on button
         btnDeleteAccount.setEnabled(false);
         btnDeleteAccount.setText("Loading...");
 
@@ -87,7 +79,6 @@ public class ProfileActivity extends AppCompatActivity {
         user.reauthenticate(credential).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 user.delete().addOnCompleteListener(deleteTask -> {
-                    // Reset button state after operation
                     btnDeleteAccount.setEnabled(true);
                     btnDeleteAccount.setText("Delete Account");
 
@@ -103,7 +94,6 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                 });
             } else {
-                // Reset button state if re-authentication fails
                 btnDeleteAccount.setEnabled(true);
                 btnDeleteAccount.setText("Delete Account");
 

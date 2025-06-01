@@ -41,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
         passwordInput = findViewById(R.id.get_pass_login);
         loginBtn = findViewById(R.id.loginBtn);
         googleBtn = findViewById(R.id.btnGoogleLogin);
-        signupText= findViewById(R.id.signup);
+        signupText = findViewById(R.id.signup);
         forgotPasswordText = findViewById(R.id.forgot_password);
 
         loginBtnOriginalText = loginBtn.getText().toString();
@@ -118,7 +118,6 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void onCredentialResponse(GetCredentialResponse credentialResponse) {
-                    // Optional: handle credential response if needed
                 }
 
                 @Override
@@ -145,8 +144,6 @@ public class LoginActivity extends AppCompatActivity {
     private void setGoogleBtnLoading(boolean isLoading) {
         runOnUiThread(() -> {
             googleBtn.setEnabled(!isLoading);
-            // googleBtn is ImageButton so no text; you might add a spinner overlay in UI if desired
-            // For now, just disable/enable the button for feedback
         });
     }
 

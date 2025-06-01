@@ -45,11 +45,12 @@ public class SplashActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
                 startActivity(intent);
-                finish(); // This closes the current SplashActivity
+                finish();
             }
         });
 
     }
+
     private void goToMainActivity() {
         startActivity(new Intent(SplashActivity.this, MainActivity.class));
         finish();

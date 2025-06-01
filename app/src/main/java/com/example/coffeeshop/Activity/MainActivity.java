@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
 
         authRepository = new AuthRepository(this);
 
-        // Setup toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -48,20 +47,17 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 authRepository.signOut();
 
-                // Clear saved user data (if applicable)
                 UserPreferences userPreferences = new UserPreferences(MainActivity.this);
-                userPreferences.clearUser();  // Implement this method in your UserPreferences class
+                userPreferences.clearUser();
 
-                // Redirect to LoginActivity
                 Intent intent = new Intent(MainActivity.this, SplashActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // clear back stack
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 finish();
             }
         });
 
 
-        // Fetch current user and display name
         displayUserName();
 
         initBanner();
@@ -79,12 +75,13 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, ProfileActivity.class);
             startActivity(intent);
         });
-        binding.exploreBtn.setOnClickListener(v->{});
+        binding.exploreBtn.setOnClickListener(v -> {
+        });
     }
 
     private void displayUserName() {
-        UserPreferences userPreferences = new UserPreferences(this);  // pass context
-        String userName = userPreferences.getName();  // call on instance
+        UserPreferences userPreferences = new UserPreferences(this);
+        String userName = userPreferences.getName();
 
         if (userName != null && !userName.isEmpty()) {
             if (getSupportActionBar() != null) {
@@ -98,24 +95,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initCategory() {
-        // Show progress bar
         binding.progressBarCatagory.setVisibility(View.VISIBLE);
 
-        // Observe ViewModel data
         viewModel.loadCategory().observeForever(categories -> {
-            // Set up RecyclerView layout manager
-            binding.recyclerViewCat.setLayoutManager(
-                    new LinearLayoutManager(
-                            this, // Context
-                            LinearLayoutManager.HORIZONTAL, // Orientation
-                            false // reverseLayout
-                    )
-            );
+            binding.recyclerViewCat.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
-            // Set adapter with category data
             binding.recyclerViewCat.setAdapter(new CategoryAdapter(categories));
 
-            // Hide progress bar after loading data
             binding.progressBarCatagory.setVisibility(View.GONE);
         });
         viewModel.loadCategory();
@@ -126,14 +112,11 @@ public class MainActivity extends AppCompatActivity {
 
         viewModel.loadBanner().observe(this, banners -> {
             if (banners != null && !banners.isEmpty()) {
-                Glide.with(MainActivity.this)
-                        .load(banners.get(0).getUrl())
-                        .into(binding.banner);
+                Glide.with(MainActivity.this).load(banners.get(0).getUrl()).into(binding.banner);
             }
             binding.progressBarBanner.setVisibility(View.GONE);
         });
     }
-
 
 
     private void initPopular() {

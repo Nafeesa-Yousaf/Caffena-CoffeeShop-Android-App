@@ -32,12 +32,10 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        // Initialize Repositories
         authRepo = new AuthRepository(this);
         userRepo = new UserRepository();
 
-        // Initialize Views
-        nameInput = findViewById(R.id.get_name_signup);           // NEW
+        nameInput = findViewById(R.id.get_name_signup);
         emailInput = findViewById(R.id.get_email_signup);
         passwordInput = findViewById(R.id.get_pass_signup);
         confirmPasswordInput = findViewById(R.id.get_confirm_pass_signup);
@@ -47,9 +45,8 @@ public class SignupActivity extends AppCompatActivity {
         signupBtnOriginalText = signupBtn.getText().toString();
 
 
-        // Email Sign Up
         signupBtn.setOnClickListener(v -> {
-            String name = nameInput.getText().toString().trim();          // NEW
+            String name = nameInput.getText().toString().trim();
             String email = emailInput.getText().toString().trim();
             String password = passwordInput.getText().toString().trim();
             String confirmPassword = confirmPasswordInput.getText().toString().trim();
@@ -70,7 +67,6 @@ public class SignupActivity extends AppCompatActivity {
                 @Override
 
                 public void onSignInSuccess(FirebaseUser user) {
-                    // Store in Realtime Database
                     userRepo.registerUser(name, email, user.getUid());
                     new UserRepository().fetchUser(user.getUid(), SignupActivity.this, new UserRepository.OnUserFetchListener() {
                         @Override
@@ -88,7 +84,6 @@ public class SignupActivity extends AppCompatActivity {
                     });
 
 
-
                 }
 
                 @Override
@@ -99,7 +94,6 @@ public class SignupActivity extends AppCompatActivity {
             });
         });
 
-        // Google Signup (unchanged)
         googleSignupBtn.setOnClickListener(v -> {
             authRepo.signInWithGoogle(new AuthRepository.GoogleSignInCallback() {
                 @Override
@@ -126,7 +120,8 @@ public class SignupActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onCredentialResponse(GetCredentialResponse credentialResponse) {}
+                public void onCredentialResponse(GetCredentialResponse credentialResponse) {
+                }
 
                 @Override
                 public void onCredentialError(String error) {
@@ -135,18 +130,19 @@ public class SignupActivity extends AppCompatActivity {
             });
         });
 
-        // Login redirect
         loginRedirect.setOnClickListener(v -> {
             startActivity(new Intent(SignupActivity.this, LoginActivity.class));
             finish();
         });
     }
+
     private void setSignUpBtnLoading(boolean isLoading) {
         runOnUiThread(() -> {
             signupBtn.setEnabled(!isLoading);
             signupBtn.setText(isLoading ? "Loading..." : signupBtnOriginalText);
         });
     }
+
     private void goToMainActivity() {
         startActivity(new Intent(SignupActivity.this, MainActivity.class));
         finish();

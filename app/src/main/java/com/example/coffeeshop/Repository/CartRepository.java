@@ -17,7 +17,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import com.google.firebase.database.*;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -33,14 +35,13 @@ public class CartRepository {
     public CompletableFuture<Void> addToCart(String userId, String productId, Map<String, Object> productData) {
         CompletableFuture<Void> future = new CompletableFuture<>();
 
-        cartRef.child(userId).child(productId).setValue(productData)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        future.complete(null);
-                    } else {
-                        future.completeExceptionally(task.getException());
-                    }
-                });
+        cartRef.child(userId).child(productId).setValue(productData).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(null);
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
 
         return future;
     }
@@ -49,14 +50,13 @@ public class CartRepository {
     public CompletableFuture<Void> removeFromCart(String userId, String productId) {
         CompletableFuture<Void> future = new CompletableFuture<>();
 
-        cartRef.child(userId).child(productId).removeValue()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        future.complete(null);
-                    } else {
-                        future.completeExceptionally(task.getException());
-                    }
-                });
+        cartRef.child(userId).child(productId).removeValue().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(null);
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
 
         return future;
     }
@@ -65,19 +65,18 @@ public class CartRepository {
     public CompletableFuture<Void> clearCart(String userId) {
         CompletableFuture<Void> future = new CompletableFuture<>();
 
-        cartRef.child(userId).removeValue()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        future.complete(null);
-                    } else {
-                        future.completeExceptionally(task.getException());
-                    }
-                });
+        cartRef.child(userId).removeValue().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                future.complete(null);
+            } else {
+                future.completeExceptionally(task.getException());
+            }
+        });
 
         return future;
     }
 
-    // Get cart items (single read)
+    // Get cart items
     public CompletableFuture<Map<String, Map<String, Object>>> getCartItems(String userId) {
         CompletableFuture<Map<String, Map<String, Object>>> future = new CompletableFuture<>();
 
@@ -105,7 +104,7 @@ public class CartRepository {
         return future;
     }
 
-    // Listen for real-time cart updates
+
     public void listenForCartChanges(String userId, CartUpdateListener listener) {
         cartRef.child(userId).addValueEventListener(new ValueEventListener() {
             @Override
@@ -131,6 +130,7 @@ public class CartRepository {
 
     public interface CartUpdateListener {
         void onCartUpdated(Map<String, Map<String, Object>> cartItems);
+
         void onError(Exception exception);
     }
 }

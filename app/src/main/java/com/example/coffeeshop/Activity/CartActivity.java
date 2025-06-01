@@ -1,6 +1,7 @@
 package com.example.coffeeshop.Activity;
 
 import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -59,8 +60,7 @@ public class CartActivity extends AppCompatActivity {
                             }
                         });
 
-                        binding.cartView.setLayoutManager(new LinearLayoutManager(CartActivity.this,
-                                LinearLayoutManager.VERTICAL, false));
+                        binding.cartView.setLayoutManager(new LinearLayoutManager(CartActivity.this, LinearLayoutManager.VERTICAL, false));
                         binding.cartView.setAdapter(cartAdapter);
                     }
                     calculateCart();
@@ -70,8 +70,7 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onError(Exception exception) {
                 runOnUiThread(() -> {
-                    Toast.makeText(CartActivity.this, "Error loading cart: " + exception.getMessage(),
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CartActivity.this, "Error loading cart: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
                 });
             }
         });
@@ -96,8 +95,7 @@ public class CartActivity extends AppCompatActivity {
                 @Override
                 public void onError(Exception exception) {
                     runOnUiThread(() -> {
-                        Toast.makeText(CartActivity.this, "Error checking cart: " + exception.getMessage(),
-                                Toast.LENGTH_SHORT).show();
+                        Toast.makeText(CartActivity.this, "Error checking cart: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
                     });
                 }
             });
@@ -119,11 +117,9 @@ public class CartActivity extends AppCompatActivity {
                 return;
             }
 
-            // Process the order
             managmentCart.clearCart();
             Toast.makeText(this, "Order placed successfully!", Toast.LENGTH_LONG).show();
 
-            // Refresh the cart view
             initCartList();
         });
 
@@ -155,8 +151,7 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onError(Exception exception) {
                 runOnUiThread(() -> {
-                    Toast.makeText(CartActivity.this, "Error calculating total: " + exception.getMessage(),
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(CartActivity.this, "Error calculating total: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
                 });
             }
         });
@@ -165,6 +160,5 @@ public class CartActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Clean up any listeners if needed
     }
 }

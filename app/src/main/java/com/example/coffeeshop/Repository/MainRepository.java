@@ -116,27 +116,26 @@ public class MainRepository {
         MutableLiveData<List<ItemsModel>> itemsLiveData = new MutableLiveData<>();
         DatabaseReference ref = firebaseDatabase.getReference("Items");
 
-        ref.orderByChild("categoryId").equalTo(categoryId)
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot snapshot) {
-                        List<ItemsModel> list = new ArrayList<>();
+        ref.orderByChild("categoryId").equalTo(categoryId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                List<ItemsModel> list = new ArrayList<>();
 
-                        for (DataSnapshot childSnapshot : snapshot.getChildren()) {
-                            ItemsModel item = childSnapshot.getValue(ItemsModel.class);
-                            if (item != null) {
-                                list.add(item);
-                            }
-                        }
-
-                        itemsLiveData.setValue(list);
+                for (DataSnapshot childSnapshot : snapshot.getChildren()) {
+                    ItemsModel item = childSnapshot.getValue(ItemsModel.class);
+                    if (item != null) {
+                        list.add(item);
                     }
+                }
 
-                    @Override
-                    public void onCancelled(DatabaseError error) {
-                        Log.e("FirebaseError", "Data fetching error: " + error.getMessage());
-                    }
-                });
+                itemsLiveData.setValue(list);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                Log.e("FirebaseError", "Data fetching error: " + error.getMessage());
+            }
+        });
 
         return itemsLiveData;
     }

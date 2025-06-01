@@ -31,12 +31,10 @@ public class ManagmentCart {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    // Item exists, update quantity
                     ItemsModel existingItem = snapshot.getValue(ItemsModel.class);
                     existingItem.setNumberInCart(existingItem.getNumberInCart() + item.getNumberInCart());
                     cartRef.child(item.getTitle()).setValue(existingItem);
                 } else {
-                    // New item, add to cart
                     cartRef.child(item.getTitle()).setValue(item);
                 }
                 Toast.makeText(context, "Added to your Cart", Toast.LENGTH_SHORT).show();
@@ -114,11 +112,13 @@ public class ManagmentCart {
 
     public interface CartListListener {
         void onCartLoaded(ArrayList<ItemsModel> cartList);
+
         void onError(Exception exception);
     }
 
     public interface TotalFeeListener {
         void onTotalCalculated(double total);
+
         void onError(Exception exception);
     }
 

@@ -62,10 +62,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         holder.binding.numberItemTxt.setText(String.valueOf(item.getNumberInCart()));
 
         if (item.getPicUrl() != null && !item.getPicUrl().isEmpty()) {
-            Glide.with(holder.itemView.getContext())
-                    .load(item.getPicUrl().get(0))
-                    .apply(new RequestOptions().transform(new CenterCrop()))
-                    .into(holder.binding.picCart);
+            Glide.with(holder.itemView.getContext()).load(item.getPicUrl().get(0)).apply(new RequestOptions().transform(new CenterCrop())).into(holder.binding.picCart);
         }
 
         holder.binding.plusEachItem.setOnClickListener(v -> {

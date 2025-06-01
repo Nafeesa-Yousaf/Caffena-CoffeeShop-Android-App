@@ -33,16 +33,21 @@ public class AuthRepository {
     private final Context context;
     private final Executor executor = Executors.newSingleThreadExecutor();
     private final UserPreferences userPreferences;
+
     // Callback interfaces
     public interface EmailSignInCallback {
         void onSignInSuccess(FirebaseUser user);
+
         void onSignInFailure(String errorMessage);
     }
 
     public interface GoogleSignInCallback {
         void onSignInSuccess(FirebaseUser user);
+
         void onSignInFailure(String errorMessage);
+
         void onCredentialResponse(GetCredentialResponse credentialResponse);
+
         void onCredentialError(String error);
     }
 
@@ -53,12 +58,16 @@ public class AuthRepository {
         this.userPreferences = new UserPreferences(context);  // Initialize here
 
     }
+
     public interface PasswordResetCallback {
         void onResetEmailSent();
+
         void onResetFailed(String error);
     }
+
     public interface DeleteAccountCallback {
         void onDeleteSuccess();
+
         void onDeleteFailure(String errorMessage);
     }
 
@@ -66,86 +75,71 @@ public class AuthRepository {
     // Email Authentication Methods
     // Email Signup Method
     public void signUpWithEmailPassword(String email, String password, EmailSignInCallback callback) {
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "signUpWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            callback.onSignInSuccess(user);
-                        } else {
-                            Log.w(TAG, "signUpWithEmail:failure", task.getException());
-                            String errorMessage = "Signup failed";
-                            if (task.getException() != null) {
-                                errorMessage += ": " + task.getException().getMessage();
-                            }
-                            callback.onSignInFailure(errorMessage);
-                        }
+        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "signUpWithEmail:success");
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    callback.onSignInSuccess(user);
+                } else {
+                    Log.w(TAG, "signUpWithEmail:failure", task.getException());
+                    String errorMessage = "Signup failed";
+                    if (task.getException() != null) {
+                        errorMessage += ": " + task.getException().getMessage();
                     }
-                });
+                    callback.onSignInFailure(errorMessage);
+                }
+            }
+        });
     }
 
     //Email Sign In Method
     public void signInWithEmailPassword(String email, String password, EmailSignInCallback callback) {
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "signInWithEmail:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            callback.onSignInSuccess(user);
-                        } else {
-                            Log.w(TAG, "signInWithEmail:failure", task.getException());
-                            String errorMessage = "Authentication failed";
-                            if (task.getException() != null) {
-                                errorMessage += ": " + task.getException().getMessage();
-                            }
-                            callback.onSignInFailure(errorMessage);
-                        }
+        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "signInWithEmail:success");
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    callback.onSignInSuccess(user);
+                } else {
+                    Log.w(TAG, "signInWithEmail:failure", task.getException());
+                    String errorMessage = "Authentication failed";
+                    if (task.getException() != null) {
+                        errorMessage += ": " + task.getException().getMessage();
                     }
-                });
+                    callback.onSignInFailure(errorMessage);
+                }
+            }
+        });
     }
 
     // Google Authentication Methods
     public void signInWithGoogle(GoogleSignInCallback callback) {
-        GetGoogleIdOption googleIdOption = new GetGoogleIdOption.Builder()
-                .setServerClientId(context.getString(R.string.web_client_id))
-                .setFilterByAuthorizedAccounts(false)  // <-- Allow new accounts too
-                .setAutoSelectEnabled(false)           // <-- Let the user pick the account manually
-                .build();
+        GetGoogleIdOption googleIdOption = new GetGoogleIdOption.Builder().setServerClientId(context.getString(R.string.web_client_id)).setFilterByAuthorizedAccounts(false).setAutoSelectEnabled(false).build();
 
-        GetCredentialRequest request = new GetCredentialRequest.Builder()
-                .addCredentialOption(googleIdOption)
-                .build();
+        GetCredentialRequest request = new GetCredentialRequest.Builder().addCredentialOption(googleIdOption).build();
 
-        androidx.credentials.CredentialManager credentialManager =
-                androidx.credentials.CredentialManager.create(context);
+        androidx.credentials.CredentialManager credentialManager = androidx.credentials.CredentialManager.create(context);
 
-        credentialManager.getCredentialAsync(
-                context,
-                request,
-                null,
-                executor,
-                new androidx.credentials.CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
-                    @Override
-                    public void onResult(GetCredentialResponse result) {
-                        handleCredential(result, callback);
-                        callback.onCredentialResponse(result);
-                    }
+        credentialManager.getCredentialAsync(context, request, null, executor, new androidx.credentials.CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
+            @Override
+            public void onResult(GetCredentialResponse result) {
+                handleCredential(result, callback);
+                callback.onCredentialResponse(result);
+            }
 
-                    @Override
-                    public void onError(GetCredentialException e) {
-                        String errorMsg = "Google sign-in failed";
-                        if (e instanceof NoCredentialException) {
-                            errorMsg = "No credential found";
-                        }
-                        Log.e(TAG, errorMsg, e);
-                        callback.onCredentialError(errorMsg + ": " + e.getMessage());
-                    }
+            @Override
+            public void onError(GetCredentialException e) {
+                String errorMsg = "Google sign-in failed";
+                if (e instanceof NoCredentialException) {
+                    errorMsg = "No credential found";
                 }
-        );
+                Log.e(TAG, errorMsg, e);
+                callback.onCredentialError(errorMsg + ": " + e.getMessage());
+            }
+        });
     }
 
     private void handleCredential(GetCredentialResponse credentialResponse, GoogleSignInCallback callback) {
@@ -168,55 +162,51 @@ public class AuthRepository {
 
     private void firebaseAuthWithGoogle(String idToken, GoogleSignInCallback callback) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d(TAG, "signInWithCredential:success");
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        callback.onSignInSuccess(user);
-                    } else {
-                        Log.w(TAG, "signInWithCredential:failure", task.getException());
-                        callback.onSignInFailure(task.getException() != null ?
-                                task.getException().getMessage() : "Unknown error");
-                    }
-                });
+        mAuth.signInWithCredential(credential).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Log.d(TAG, "signInWithCredential:success");
+                FirebaseUser user = mAuth.getCurrentUser();
+                callback.onSignInSuccess(user);
+            } else {
+                Log.w(TAG, "signInWithCredential:failure", task.getException());
+                callback.onSignInFailure(task.getException() != null ? task.getException().getMessage() : "Unknown error");
+            }
+        });
     }
 
     //Forgot Password
     public void sendPasswordReset(String email, PasswordResetCallback callback) {
-        mAuth.sendPasswordResetEmail(email)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        callback.onResetEmailSent();
-                    } else {
-                        String error = task.getException() != null ? task.getException().getMessage() : "Unknown error";
-                        callback.onResetFailed(error);
-                    }
-                });
+        mAuth.sendPasswordResetEmail(email).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                callback.onResetEmailSent();
+            } else {
+                String error = task.getException() != null ? task.getException().getMessage() : "Unknown error";
+                callback.onResetFailed(error);
+            }
+        });
     }
 
 
-//Delete Account Method
-public void deleteUserAccount(DeleteAccountCallback callback) {
-    FirebaseUser user = mAuth.getCurrentUser();
+    //Delete Account Method
+    public void deleteUserAccount(DeleteAccountCallback callback) {
+        FirebaseUser user = mAuth.getCurrentUser();
 
-    if (user != null) {
-        user.delete()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d(TAG, "User account deleted.");
-                        userPreferences.clearUser(); // Clear local user data
-                        callback.onDeleteSuccess();
-                    } else {
-                        String error = task.getException() != null ? task.getException().getMessage() : "Unknown error";
-                        Log.e(TAG, "Account deletion failed: " + error);
-                        callback.onDeleteFailure(error);
-                    }
-                });
-    } else {
-        callback.onDeleteFailure("No user is currently signed in.");
+        if (user != null) {
+            user.delete().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Log.d(TAG, "User account deleted.");
+                    userPreferences.clearUser();
+                    callback.onDeleteSuccess();
+                } else {
+                    String error = task.getException() != null ? task.getException().getMessage() : "Unknown error";
+                    Log.e(TAG, "Account deletion failed: " + error);
+                    callback.onDeleteFailure(error);
+                }
+            });
+        } else {
+            callback.onDeleteFailure("No user is currently signed in.");
+        }
     }
-}
 
     // Common Methods
     public FirebaseUser getCurrentUser() {

@@ -52,12 +52,14 @@ public class ForgotPasswordActivity extends AppCompatActivity {
             });
         });
     }
+
     private void setBtnLoading(boolean isLoading) {
         runOnUiThread(() -> {
             resetPasswordBtn.setEnabled(!isLoading);
             resetPasswordBtn.setText(isLoading ? "Loading..." : forgotBtnOriginalText);
         });
     }
+
     private void showToast(String message) {
         Toast.makeText(ForgotPasswordActivity.this, message, Toast.LENGTH_SHORT).show();
     }

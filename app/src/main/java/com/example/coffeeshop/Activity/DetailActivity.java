@@ -3,6 +3,7 @@ package com.example.coffeeshop.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -18,7 +19,7 @@ public class DetailActivity extends AppCompatActivity {
     private ManagmentCart managmentCart;
     private double basePrice = 0.0;
     private String selectedSize;
-    private int quantity=1;
+    private int quantity = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,28 +87,24 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        // Add to Cart button
         binding.addToCartBtn.setOnClickListener(v -> {
             int quantity = Integer.parseInt(binding.numberItemTxt.getText().toString());
             item.setNumberInCart(quantity);
             managmentCart.insertItems(item);
         });
 
-        // Back button
         binding.backBtn.setOnClickListener(v -> {
 
             finish();
         });
 
-        // Plus button to increase quantity
         binding.plusCart.setOnClickListener(v -> {
-             quantity++;
+            quantity++;
             item.setNumberInCart(quantity);
             binding.numberItemTxt.setText(String.valueOf(quantity));
             updatePrice();
         });
 
-        // Minus button to decrease quantity
         binding.minusBtn.setOnClickListener(v -> {
             if (quantity > 0) {
                 quantity--;
