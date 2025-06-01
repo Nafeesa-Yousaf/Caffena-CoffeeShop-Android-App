@@ -82,8 +82,7 @@ public class DetailActivity extends AppCompatActivity {
 
         // Back button
         binding.backBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(DetailActivity.this, MainActivity.class);
-            startActivity(intent);
+
             finish();
         });
 
