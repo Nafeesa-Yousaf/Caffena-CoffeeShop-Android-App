@@ -49,7 +49,7 @@ public class DetailActivity extends AppCompatActivity {
                 binding.descriptionTxt.setText(item.getDescription());
                 binding.ratingTxt.setText(String.valueOf(item.getRating()));
 
-                binding.numberItemTxt.setText(String.valueOf(item.getNumberInCart()));
+                binding.numberItemTxt.setText(String.valueOf(1));
                 basePrice = 1;
                 selectedSize = "Small";
                 binding.smallBtn.setBackgroundResource(R.drawable.stroke_brown_bg);
