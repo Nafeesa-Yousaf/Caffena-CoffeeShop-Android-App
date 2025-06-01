@@ -17,88 +17,120 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.google.firebase.database.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class CartRepository {
-    private static final String PREFS_NAME = "CoffeeShopPrefs";
-    private static final String USER_ID_KEY = "uid";
-
     private final DatabaseReference cartRef;
-    private final String userId;
 
-    public CartRepository(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        userId = prefs.getString(USER_ID_KEY, null);
-
-        if (userId == null) {
-            throw new IllegalStateException("User ID not found in SharedPreferences");
-        }
-
-        cartRef = FirebaseDatabase.getInstance().getReference("carts").child(userId);
+    public CartRepository() {
+        this.cartRef = FirebaseDatabase.getInstance().getReference("carts");
     }
 
-    public void insertOrUpdateItems(List<ItemsModel> items, final DatabaseOperationCallback callback) {
-        Map<String, Object> cartUpdates = new HashMap<>();
-        for (ItemsModel item : items) {
-            cartUpdates.put(item.getTitle(), item);
-        }
+    // Add or update item in cart
+    public CompletableFuture<Void> addToCart(String userId, String productId, Map<String, Object> productData) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
 
-        cartRef.updateChildren(cartUpdates)
-                .addOnSuccessListener(aVoid -> {
-                    if (callback != null) callback.onSuccess();
-                })
-                .addOnFailureListener(e -> {
-                    if (callback != null) callback.onFailure(e);
+        cartRef.child(userId).child(productId).setValue(productData)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        future.complete(null);
+                    } else {
+                        future.completeExceptionally(task.getException());
+                    }
                 });
+
+        return future;
     }
 
-    public void getCartItems(final CartDataCallback callback) {
-        cartRef.addListenerForSingleValueEvent(new ValueEventListener() {
+    // Remove item from cart
+    public CompletableFuture<Void> removeFromCart(String userId, String productId) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        cartRef.child(userId).child(productId).removeValue()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        future.complete(null);
+                    } else {
+                        future.completeExceptionally(task.getException());
+                    }
+                });
+
+        return future;
+    }
+
+    // Clear entire cart
+    public CompletableFuture<Void> clearCart(String userId) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        cartRef.child(userId).removeValue()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        future.complete(null);
+                    } else {
+                        future.completeExceptionally(task.getException());
+                    }
+                });
+
+        return future;
+    }
+
+    // Get cart items (single read)
+    public CompletableFuture<Map<String, Map<String, Object>>> getCartItems(String userId) {
+        CompletableFuture<Map<String, Map<String, Object>>> future = new CompletableFuture<>();
+
+        cartRef.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                List<ItemsModel> items = new ArrayList<>();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    ItemsModel item = snapshot.getValue(ItemsModel.class);
-                    if (item != null) {
-                        items.add(item);
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, Map<String, Object>> cartItems = new HashMap<>();
+
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot itemSnapshot : dataSnapshot.getChildren()) {
+                        Map<String, Object> item = (Map<String, Object>) itemSnapshot.getValue();
+                        cartItems.put(itemSnapshot.getKey(), item);
                     }
                 }
-                callback.onCartDataLoaded(items);
+
+                future.complete(cartItems);
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                callback.onError(databaseError.toException());
+            public void onCancelled(DatabaseError databaseError) {
+                future.completeExceptionally(databaseError.toException());
+            }
+        });
+
+        return future;
+    }
+
+    // Listen for real-time cart updates
+    public void listenForCartChanges(String userId, CartUpdateListener listener) {
+        cartRef.child(userId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, Map<String, Object>> cartItems = new HashMap<>();
+
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot itemSnapshot : dataSnapshot.getChildren()) {
+                        Map<String, Object> item = (Map<String, Object>) itemSnapshot.getValue();
+                        cartItems.put(itemSnapshot.getKey(), item);
+                    }
+                }
+
+                listener.onCartUpdated(cartItems);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                listener.onError(databaseError.toException());
             }
         });
     }
 
-    public void removeItem(String itemTitle, final DatabaseOperationCallback callback) {
-        cartRef.child(itemTitle).removeValue()
-                .addOnSuccessListener(aVoid -> {
-                    if (callback != null) callback.onSuccess();
-                })
-                .addOnFailureListener(e -> {
-                    if (callback != null) callback.onFailure(e);
-                });
-    }
-
-    public void clearCart(final DatabaseOperationCallback callback) {
-        cartRef.removeValue()
-                .addOnSuccessListener(aVoid -> {
-                    if (callback != null) callback.onSuccess();
-                })
-                .addOnFailureListener(e -> {
-                    if (callback != null) callback.onFailure(e);
-                });
-    }
-
-    public interface CartDataCallback {
-        void onCartDataLoaded(List<ItemsModel> items);
-        void onError(Exception e);
-    }
-
-    public interface DatabaseOperationCallback {
-        void onSuccess();
-        void onFailure(Exception e);
+    public interface CartUpdateListener {
+        void onCartUpdated(Map<String, Map<String, Object>> cartItems);
+        void onError(Exception exception);
     }
 }

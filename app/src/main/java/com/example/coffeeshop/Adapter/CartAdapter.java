@@ -31,6 +31,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         this.managmentCart = new ManagmentCart(context);
     }
 
+    public void updateList(ArrayList<ItemsModel> newList) {
+        this.listItemSelected = newList;
+        notifyDataSetChanged();
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ViewholderCartBinding binding;
 
@@ -56,14 +61,17 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         holder.binding.totalEachItem.setText("$" + Math.round(item.getNumberInCart() * item.getPrice()));
         holder.binding.numberItemTxt.setText(String.valueOf(item.getNumberInCart()));
 
-        Glide.with(holder.itemView.getContext())
-                .load(item.getPicUrl().get(0))
-                .apply(new RequestOptions().transform(new CenterCrop()))
-                .into(holder.binding.picCart);
+        if (item.getPicUrl() != null && !item.getPicUrl().isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(item.getPicUrl().get(0))
+                    .apply(new RequestOptions().transform(new CenterCrop()))
+                    .into(holder.binding.picCart);
+        }
 
         holder.binding.plusEachItem.setOnClickListener(v -> {
-            managmentCart.plusItem(listItemSelected, position, () -> {
-                notifyDataSetChanged();
+            managmentCart.plusItem(item, () -> {
+                item.setNumberInCart(item.getNumberInCart() + 1);
+                notifyItemChanged(position);
                 if (changeNumberItemsListener != null) {
                     changeNumberItemsListener.onChanged();
                 }
@@ -71,8 +79,15 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         });
 
         holder.binding.minusEachItem.setOnClickListener(v -> {
-            managmentCart.minusItem(listItemSelected, position, () -> {
-                notifyDataSetChanged();
+            managmentCart.minusItem(item, () -> {
+                if (item.getNumberInCart() > 1) {
+                    item.setNumberInCart(item.getNumberInCart() - 1);
+                    notifyItemChanged(position);
+                } else {
+                    listItemSelected.remove(position);
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, listItemSelected.size());
+                }
                 if (changeNumberItemsListener != null) {
                     changeNumberItemsListener.onChanged();
                 }
@@ -80,8 +95,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ViewHolder> {
         });
 
         holder.binding.removeItemBtn.setOnClickListener(v -> {
-            managmentCart.removeItem(listItemSelected, position, () -> {
-                notifyDataSetChanged();
+            managmentCart.removeItem(item, () -> {
+                listItemSelected.remove(position);
+                notifyItemRemoved(position);
+                notifyItemRangeChanged(position, listItemSelected.size());
                 if (changeNumberItemsListener != null) {
                     changeNumberItemsListener.onChanged();
                 }
