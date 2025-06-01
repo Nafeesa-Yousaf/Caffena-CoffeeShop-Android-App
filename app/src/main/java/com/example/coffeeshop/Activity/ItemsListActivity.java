@@ -46,12 +46,12 @@ public class ItemsListActivity extends AppCompatActivity {
         viewModel.loadItems(id).observe(this, new Observer<List<ItemsModel>>() {
             @Override
             public void onChanged(List<ItemsModel> itemsModels) {
-                binding.listView.setLayoutManager(new LinearLayoutManager(
+                binding.cartView.setLayoutManager(new LinearLayoutManager(
                         ItemsListActivity.this,
                         LinearLayoutManager.VERTICAL,
                         false
                 ));
-                binding.listView.setAdapter(new ItemsListCategoryAdapter(itemsModels));
+                binding.cartView.setAdapter(new ItemsListCategoryAdapter(itemsModels));
                 binding.progressBar.setVisibility(View.GONE);
             }
         });

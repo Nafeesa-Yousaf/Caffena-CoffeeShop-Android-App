@@ -67,6 +67,14 @@ public class MainActivity extends AppCompatActivity {
         initBanner();
         initCategory();
         initPopular();
+        initBottomMenu();
+    }
+
+    private void initBottomMenu() {
+        binding.cartBtn.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, CartActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void displayUserName() {
