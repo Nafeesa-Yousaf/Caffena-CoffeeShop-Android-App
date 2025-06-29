@@ -39,14 +39,10 @@ public class ItemsListCategoryAdapter extends RecyclerView.Adapter<RecyclerView.
         context = parent.getContext();
 
         if (viewType == TYPE_ITEM1) {
-            ViewholderItemPicRightBinding binding = ViewholderItemPicRightBinding.inflate(
-                    LayoutInflater.from(context), parent, false
-            );
+            ViewholderItemPicRightBinding binding = ViewholderItemPicRightBinding.inflate(LayoutInflater.from(context), parent, false);
             return new ViewHolderItem1(binding);
         } else {
-            ViewholderItemPicLeftBinding binding = ViewholderItemPicLeftBinding.inflate(
-                    LayoutInflater.from(context), parent, false
-            );
+            ViewholderItemPicLeftBinding binding = ViewholderItemPicLeftBinding.inflate(LayoutInflater.from(context), parent, false);
             return new ViewHolderItem2(binding);
         }
     }
@@ -55,10 +51,7 @@ public class ItemsListCategoryAdapter extends RecyclerView.Adapter<RecyclerView.
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ItemsModel item = items.get(position);
 
-        // Avoid IndexOutOfBoundsException
-        String picUrl = (item.getPicUrl() != null && !item.getPicUrl().isEmpty())
-                ? item.getPicUrl().get(0)
-                : "";
+        String picUrl = (item.getPicUrl() != null && !item.getPicUrl().isEmpty()) ? item.getPicUrl().get(0) : "";
 
         bindCommonData(holder, item.getTitle(), String.valueOf(item.getPrice()), (float) item.getRating(), picUrl, position);
     }
@@ -70,13 +63,11 @@ public class ItemsListCategoryAdapter extends RecyclerView.Adapter<RecyclerView.
             binding.priceTxt.setText(priceTxt);
             binding.ratingBar.setRating(rating);
 
-            Glide.with(context)
-                    .load(picUrl)
-                    .into(binding.picMain);
+            Glide.with(context).load(picUrl).into(binding.picMain);
 
             holder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(context, DetailActivity.class);
-                intent.putExtra("object", items.get(position)); // Make sure ItemsModel implements Serializable or Parcelable
+                intent.putExtra("object", items.get(position));
                 context.startActivity(intent);
             });
 
@@ -86,13 +77,11 @@ public class ItemsListCategoryAdapter extends RecyclerView.Adapter<RecyclerView.
             binding.priceTxt.setText(priceTxt);
             binding.ratingBar.setRating(rating);
 
-            Glide.with(context)
-                    .load(picUrl)
-                    .into(binding.picMain);
+            Glide.with(context).load(picUrl).into(binding.picMain);
 
             holder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(context, DetailActivity.class);
-                intent.putExtra("object", items.get(position)); // Ensure ItemsModel is Serializable/Parcelable
+                intent.putExtra("object", items.get(position));
                 context.startActivity(intent);
             });
         }

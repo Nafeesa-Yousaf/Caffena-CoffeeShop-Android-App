@@ -77,7 +77,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
             }
         });
 
-        // Ensure the correct background is set after selection update
         if (selectedPosition == position) {
             holder.binding.titleCat.setBackgroundResource(R.drawable.drak_brown_bg);
             holder.binding.titleCat.setTextColor(context.getResources().getColor(R.color.white));

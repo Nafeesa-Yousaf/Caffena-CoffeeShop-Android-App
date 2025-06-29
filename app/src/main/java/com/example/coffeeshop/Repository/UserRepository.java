@@ -20,27 +20,23 @@ public class UserRepository {
         auth = FirebaseAuth.getInstance();
     }
 
-    // Register user in Realtime Database
     public void registerUser(String name, String email, String uid) {
         UserModel user = new UserModel(uid, name, email);
-        userRef.child(uid).setValue(user)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        // User registered successfully in DB
-                    } else {
-                        // Handle failure
-                    }
-                });
+        userRef.child(uid).setValue(user).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // User registered successfully in DB
+            } else {
+                // Handle failure
+            }
+        });
     }
 
-    // Fetch user data during login and save to SharedPreferences
     public void fetchUser(String uid, Context context, final OnUserFetchListener listener) {
         userRef.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 UserModel user = snapshot.getValue(UserModel.class);
                 if (user != null) {
-                    // Save user data in SharedPreferences
                     UserPreferences preferences = new UserPreferences(context);
                     preferences.saveUser(user.getUid(), user.getName(), user.getEmail());
 
@@ -57,9 +53,9 @@ public class UserRepository {
         });
     }
 
-    // Callback Interface
     public interface OnUserFetchListener {
         void onUserFetched(UserModel user);
+
         void onFailure(String errorMessage);
     }
 }
