@@ -2,12 +2,17 @@ package com.example.coffeeshop.Adapter;
 
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.coffeeshop.Activity.ItemsListActivity;
 import com.example.coffeeshop.Domain.CategoryModel;
 import com.example.coffeeshop.R;
 import com.example.coffeeshop.databinding.ViewholderCategoryBinding;
@@ -54,6 +59,14 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
             notifyItemChanged(lastSelectedPosition);
             notifyItemChanged(selectedPosition);
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                Intent intent = new Intent(context, ItemsListActivity.class);
+                intent.putExtra("id", String.valueOf(item.getId()));
+                intent.putExtra("title", item.getTitle());
+
+                ContextCompat.startActivity(context, intent, null);
+            }, 500);
+
 
             if (selectedPosition == position) {
                 holder.binding.titleCat.setBackgroundResource(R.drawable.drak_brown_bg);
@@ -64,7 +77,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
             }
         });
 
-        // Ensure the correct background is set after selection update
         if (selectedPosition == position) {
             holder.binding.titleCat.setBackgroundResource(R.drawable.drak_brown_bg);
             holder.binding.titleCat.setTextColor(context.getResources().getColor(R.color.white));

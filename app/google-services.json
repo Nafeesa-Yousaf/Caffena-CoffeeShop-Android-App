@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "994795155756",
+    "firebase_url": "https://android-coffee-shop-default-rtdb.firebaseio.com",
     "project_id": "android-coffee-shop",
     "storage_bucket": "android-coffee-shop.firebasestorage.app"
   },
@@ -12,7 +13,20 @@
           "package_name": "com.example.coffeeshop"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "994795155756-gkkpa5o1uuuhlup12l252fnldivpi79f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.coffeeshop",
+            "certificate_hash": "db2e28a025f1de4aee53a73a4a47a20400f2e583"
+          }
+        },
+        {
+          "client_id": "994795155756-bn1etvqbibvrk7gk4giprb1t9qmrg7pi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyD0Z-lOxP786pgxMAYE8-GyeTYMFckEeoc"
@@ -20,7 +34,41 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "994795155756-bn1etvqbibvrk7gk4giprb1t9qmrg7pi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:994795155756:android:cc7de195ae800d0765fc89",
+        "android_client_info": {
+          "package_name": "com.nafeesa.assignment3"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "994795155756-bn1etvqbibvrk7gk4giprb1t9qmrg7pi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0Z-lOxP786pgxMAYE8-GyeTYMFckEeoc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "994795155756-bn1etvqbibvrk7gk4giprb1t9qmrg7pi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

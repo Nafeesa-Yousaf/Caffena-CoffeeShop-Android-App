@@ -1,12 +1,16 @@
 package com.example.coffeeshop.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.coffeeshop.Activity.DetailActivity;
 import com.example.coffeeshop.Domain.ItemsModel;
 import com.example.coffeeshop.databinding.ViewholderPopularBinding;
 
@@ -34,8 +38,7 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
-        ViewholderPopularBinding binding = ViewholderPopularBinding.inflate(
-                LayoutInflater.from(context), parent, false);
+        ViewholderPopularBinding binding = ViewholderPopularBinding.inflate(LayoutInflater.from(context), parent, false);
         return new ViewHolder(binding);
     }
 
@@ -46,10 +49,18 @@ public class PopularAdapter extends RecyclerView.Adapter<PopularAdapter.ViewHold
         holder.binding.titleTxt.setText(item.getTitle());
         holder.binding.priceTxt.setText("$" + item.getPrice());
 
-        Glide.with(context)
-                .load(item.getPicUrl().get(0)) // Load first image from picUrl list
-                .into(holder.binding.pic);
+        Glide.with(context).load(item.getPicUrl().get(0)).into(holder.binding.pic);
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, DetailActivity.class);
+                intent.putExtra("object", item);
+                context.startActivity(intent);
+            }
+        });
     }
+
 
     @Override
     public int getItemCount() {

@@ -30,4 +30,9 @@ public class MainViewModel extends ViewModel {
     public LiveData<List<ItemsModel>> loadPopular() {
         return repository.loadPopular();
     }
+
+    public LiveData<List<ItemsModel>> loadItems(String categoryId) {
+        return repository.loadItemsCategory(categoryId);
+    }
+
 }
