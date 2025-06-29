@@ -23,7 +23,7 @@ public class SignupActivity extends AppCompatActivity {
     private Button signupBtn;
     private ImageButton googleSignupBtn;
     private TextView loginRedirect;
-
+    private String signupBtnOriginalText;
     private AuthRepository authRepo;
     private UserRepository userRepo;
 
@@ -32,22 +32,21 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
 
-        // Initialize Repositories
         authRepo = new AuthRepository(this);
         userRepo = new UserRepository();
 
-        // Initialize Views
-        nameInput = findViewById(R.id.get_name_signup);           // NEW
+        nameInput = findViewById(R.id.get_name_signup);
         emailInput = findViewById(R.id.get_email_signup);
         passwordInput = findViewById(R.id.get_pass_signup);
         confirmPasswordInput = findViewById(R.id.get_confirm_pass_signup);
         signupBtn = findViewById(R.id.signupBtn);
         googleSignupBtn = findViewById(R.id.btnGoogleSignup);
         loginRedirect = findViewById(R.id.login_redirect);
+        signupBtnOriginalText = signupBtn.getText().toString();
 
-        // Email Sign Up
+
         signupBtn.setOnClickListener(v -> {
-            String name = nameInput.getText().toString().trim();          // NEW
+            String name = nameInput.getText().toString().trim();
             String email = emailInput.getText().toString().trim();
             String password = passwordInput.getText().toString().trim();
             String confirmPassword = confirmPasswordInput.getText().toString().trim();
@@ -61,37 +60,40 @@ public class SignupActivity extends AppCompatActivity {
                 showToast("Passwords do not match");
                 return;
             }
+            setSignUpBtnLoading(true);
 
             authRepo.signUpWithEmailPassword(email, password, new AuthRepository.EmailSignInCallback() {
+
                 @Override
+
                 public void onSignInSuccess(FirebaseUser user) {
-                    // Store in Realtime Database
                     userRepo.registerUser(name, email, user.getUid());
                     new UserRepository().fetchUser(user.getUid(), SignupActivity.this, new UserRepository.OnUserFetchListener() {
                         @Override
                         public void onUserFetched(UserModel userModel) {
                             showToast("Sign up successful!");
+                            setSignUpBtnLoading(false);
                             goToMainActivity();
                         }
 
                         @Override
                         public void onFailure(String errorMessage) {
                             showToast("User data fetch failed: " + errorMessage);
+                            setSignUpBtnLoading(false);
                         }
                     });
-
 
 
                 }
 
                 @Override
                 public void onSignInFailure(String errorMessage) {
+                    setSignUpBtnLoading(false);
                     showToast("Sign up failed: " + errorMessage);
                 }
             });
         });
 
-        // Google Signup (unchanged)
         googleSignupBtn.setOnClickListener(v -> {
             authRepo.signInWithGoogle(new AuthRepository.GoogleSignInCallback() {
                 @Override
@@ -118,7 +120,8 @@ public class SignupActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onCredentialResponse(GetCredentialResponse credentialResponse) {}
+                public void onCredentialResponse(GetCredentialResponse credentialResponse) {
+                }
 
                 @Override
                 public void onCredentialError(String error) {
@@ -127,10 +130,16 @@ public class SignupActivity extends AppCompatActivity {
             });
         });
 
-        // Login redirect
         loginRedirect.setOnClickListener(v -> {
             startActivity(new Intent(SignupActivity.this, LoginActivity.class));
             finish();
+        });
+    }
+
+    private void setSignUpBtnLoading(boolean isLoading) {
+        runOnUiThread(() -> {
+            signupBtn.setEnabled(!isLoading);
+            signupBtn.setText(isLoading ? "Loading..." : signupBtnOriginalText);
         });
     }
 

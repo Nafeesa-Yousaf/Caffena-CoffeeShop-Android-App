@@ -13,7 +13,6 @@ public class ItemsModel implements Serializable {
     private int numberInCart;
     private String extra;
 
-    // Constructor
     public ItemsModel() {
         this.title = "";
         this.description = "";
@@ -24,7 +23,6 @@ public class ItemsModel implements Serializable {
         this.extra = "*";
     }
 
-    // Getters and Setters
     public String getTitle() {
         return title;
     }

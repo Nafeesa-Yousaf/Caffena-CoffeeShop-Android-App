@@ -28,6 +28,8 @@ public class LoginActivity extends AppCompatActivity {
     private TextView forgotPasswordText;
     CallbackManager callbackManager = CallbackManager.Factory.create();
 
+    private String loginBtnOriginalText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,36 +41,37 @@ public class LoginActivity extends AppCompatActivity {
         passwordInput = findViewById(R.id.get_pass_login);
         loginBtn = findViewById(R.id.loginBtn);
         googleBtn = findViewById(R.id.btnGoogleLogin);
-        signupText= findViewById(R.id.signup);
+        signupText = findViewById(R.id.signup);
         forgotPasswordText = findViewById(R.id.forgot_password);
 
+        loginBtnOriginalText = loginBtn.getText().toString();
 
-
-        // Link with forgot password screen
         forgotPasswordText.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
             startActivity(intent);
         });
 
-        // Email login
         loginBtn.setOnClickListener(v -> {
             String email = emailInput.getText().toString().trim();
             String password = passwordInput.getText().toString().trim();
 
             if (!email.isEmpty() && !password.isEmpty()) {
+                setLoginBtnLoading(true);
+
                 authRepo.signInWithEmailPassword(email, password, new AuthRepository.EmailSignInCallback() {
                     @Override
                     public void onSignInSuccess(FirebaseUser user) {
-                        // 👇 Fetch the user info from DB using UID and save in SharedPreferences
                         new UserRepository().fetchUser(user.getUid(), LoginActivity.this, new UserRepository.OnUserFetchListener() {
                             @Override
                             public void onUserFetched(UserModel userModel) {
+                                setLoginBtnLoading(false);
                                 showToast("Welcome, " + userModel.getName());
                                 goToMainActivity();
                             }
 
                             @Override
                             public void onFailure(String errorMessage) {
+                                setLoginBtnLoading(false);
                                 showToast("User data fetch failed: " + errorMessage);
                             }
                         });
@@ -76,30 +79,32 @@ public class LoginActivity extends AppCompatActivity {
 
                     @Override
                     public void onSignInFailure(String errorMessage) {
+                        setLoginBtnLoading(false);
                         showToast("Incorrect Email or Password");
                     }
                 });
-
             } else {
                 showToast("Email and Password cannot be empty");
             }
         });
 
-        // Google login
         googleBtn.setOnClickListener(v -> {
+            setGoogleBtnLoading(true);
+
             authRepo.signInWithGoogle(new AuthRepository.GoogleSignInCallback() {
                 @Override
                 public void onSignInSuccess(FirebaseUser user) {
-                    // 👇 Fetch user info and save in SharedPreferences
                     new UserRepository().fetchUser(user.getUid(), LoginActivity.this, new UserRepository.OnUserFetchListener() {
                         @Override
                         public void onUserFetched(UserModel userModel) {
+                            setGoogleBtnLoading(false);
                             showToast("Welcome, " + userModel.getName());
                             goToMainActivity();
                         }
 
                         @Override
                         public void onFailure(String errorMessage) {
+                            setGoogleBtnLoading(false);
                             showToast("User data fetch failed: " + errorMessage);
                         }
                     });
@@ -107,25 +112,38 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void onSignInFailure(String errorMessage) {
+                    setGoogleBtnLoading(false);
                     showToast("Google sign-in failed: " + errorMessage);
                 }
 
                 @Override
                 public void onCredentialResponse(GetCredentialResponse credentialResponse) {
-                    // Optional: handle credential response if needed
                 }
 
                 @Override
                 public void onCredentialError(String error) {
+                    setGoogleBtnLoading(false);
                     showToast("Google sign-in error: " + error);
                 }
             });
         });
 
-        // Redirect to signup page
         signupText.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
             startActivity(intent);
+        });
+    }
+
+    private void setLoginBtnLoading(boolean isLoading) {
+        runOnUiThread(() -> {
+            loginBtn.setEnabled(!isLoading);
+            loginBtn.setText(isLoading ? "Loading..." : loginBtnOriginalText);
+        });
+    }
+
+    private void setGoogleBtnLoading(boolean isLoading) {
+        runOnUiThread(() -> {
+            googleBtn.setEnabled(!isLoading);
         });
     }
 
